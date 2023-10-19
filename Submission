@@ -1,0 +1,129 @@
+#Choose Telnet or SSH 
+import pexpect
+# Define variables
+#varibles given from EVE-NG Basic Configuration change if needs be for submission
+#NOTE: these varibles are hardcoded for now, move to a file and extract the data into a list to use from there 
+ip_address = '192.168.56.101'
+username = 'cisco'
+password = 'cisco'
+EnablePassword = 'class'
+#create funtion to chose ssh or telnet, user will pick and new function will launch 
+def chosefunc():
+    while True:
+        print('\n____USER INPUT____')
+        print('1. Telnet to Device')
+        print('2. SSH to Device')
+        op = input('Option: ')
+        if op == '1':
+            Telnetfunc()
+
+        elif op == '2':
+            SSHfunc()
+        else:
+            print('incorrect input try again')
+        
+
+
+
+#_________________________________Telnet______________________________________#
+def Telnetfunc(): #Function used for telnetting to the network device 
+    print('telnet')
+    #Create the telnetting session via the spawn method, using utf encoding and set the time out timer to 10s
+    TelnetSession = pexpect.spawn('telnet ' + ip_address, encoding='utf-8', timeout=10)
+    TelnetResult = TelnetSession.expect(['Username:', pexpect.TIMEOUT]) #expect to see 'Username:' in the terminal after successfull telnet login, save reult as var TelnetResult for error checking 
+    
+    #error check for the above expect statment, if expect finds 'Username:' after succsessfull login atempt pass on, ELSE telnet attmept was unsucsessful; inform the user and quit
+    if TelnetResult == 0:
+        print('--- Telnet atempt Succsessful')
+        pass
+    else:
+        print('--- Telnet atempt uncuccsessful')
+        exit()
+
+    #Send var username to terminal to log-in with the spesified username 
+    TelnetSession.sendline(username)
+    TelnetResult = TelnetSession.expect(['Password:', pexpect.TIMEOUT]) #expect to see 'Password:' in the terminal after successfull username input, save reult as var TelnetResult for error checking 
+
+    #error check for the above expect statment, if expect finds 'Password:' after succsessfull input pass on, ELSE username was unsucsessful; inform the user and quit
+    if TelnetResult == 0:
+        print('--- Username atempt Succsessful')
+        pass
+    else:
+        print('--- Username atempt uncuccsessful', username)
+        exit()
+
+    #Send var password to terminal to log-in with the spesified password 
+    TelnetSession.sendline(password)
+    TelnetResult=TelnetSession.expect(['#', pexpect.TIMEOUT])#Expect to see '#' after succsessful login with username and password 
+
+    #error check for the above expect statment, if expect finds '#:' after succsessfull  log-in pass on, ELSE password was incorect; inform the user and quit
+    if TelnetResult == 0:
+        print('--- password Log-in atempt Succsessful')
+        pass
+    #This else is for future proofing. In some cases while testing when inputting a username and password to enter via telnet, you would gain accsess at user EXEC(>) not privliged EXEC (#)
+    #Created a nested IF for when this situation occurs to send user to privliged EXEC mode so the rest of the script can run as usual. 
+    #There may be a cleaner way to do this. store expect as a string varible and check the result? but this works for now.
+    else:
+        TelnetResult=TelnetSession.expect(['>', pexpect.TIMEOUT])#Expect to see '>' after succsessful login with username and password
+
+        if TelnetResult == 0:
+            TelnetSession.sendline('enable') #send 'enable' to the terminal to enter privliged EXEC mode 
+            TelnetSession.sendline(EnablePassword) #sned the enable password to the terminal to enter privliged EXEC mode
+            pass
+
+        else:
+            print('--- password Login atempt uncuccsessful', password)
+            exit()
+
+    # Display a success message if it works
+    print('------------------------------------------------------')
+    print('')
+    print('--- Success! connecting to: ', ip_address)
+    print('--- Username: ', username)
+    print('--- Password: ', password)
+    print('')
+    print('------------------------------------------------------')
+
+    #Next part of the task, set a new hostname
+    #Turn hostname into to func 
+    
+
+    TelnetSession.sendline('conf t') #send conf t(congiure terminal) to the terminal to enter global configuation
+    TelnetResult=TelnetSession.expect(['\(config\)#', pexpect.TIMEOUT])#Expect to see '(config)#' after sending the conf t comand to the terminal use .\\ arounf conf
+    #Config error check
+    if TelnetResult == 0:
+        print('--- Entering Config mode')
+        
+        pass
+    else:
+        print('--- Entering config uncuccsessful')
+        exit()
+
+    print('\nPlease enter the name of the Device')
+    Hostname = input('Name:') #user inputs a new hostname, save as a varible for sendline later
+    TelnetSession.sendline(f'hostname {Hostname}') #send the hostname command with the hostname varible to set the new name, note the sting has to be set this way as sendline() only take 1 positinal argument
+    print(Hostname+'(config)#')
+    TelnetResult=TelnetSession.expect([Hostname+'\(config\)#', pexpect.TIMEOUT])#Expect to see the new 'hostname(config)#' after its been set
+
+    #host name error check 
+    if TelnetResult == 0:
+        print('--- Name change Succsesful')
+        TelnetSession.sendline('exit') # exit global configuration after hostname change (for future proofing incase adding more functions)
+        pass
+    else:
+        print('--- Hostname error could not set',Hostname)
+        exit()
+     
+    # Terminate telnet to device and close session
+    TelnetSession.sendline('quit')
+    TelnetSession.close()
+    exit() # quit program to close the loop
+    
+#_________________________________SSH______________________________________#
+def SSHfunc():
+    print('SSH')
+
+def main():
+    chosefunc()
+
+main()
