@@ -1,6 +1,6 @@
 #Import Pexpect for terminal automation 
 import pexpect
-
+global Session #made session global for now so threes no erros when puching it through functions, change later
 
 #NOTE: these varibles are hardcoded for now, move to a file and extract the data into a list to use from there 
 #NOTE: In some Expect() error checks there are nested ifs for redundancy in ther case there is more than one posability on the terminal line, 
@@ -115,8 +115,9 @@ def Telnetfunc(): #Function used for telnetting to the network device
         pass
     else:
         print('--- Hostname error could not set',Hostname)
+        TelnetSession.sendline('exit')
         exit()
-     
+    
     # Terminate telnet to device and close session
     TelnetSession.sendline('quit')
     TelnetSession.close()
@@ -181,7 +182,36 @@ def SSHfunc():
     SshSession.close()
     exit() # quit program to close the loo
 
+def HostName():
+    Session.sendline('conf t') #send conf t(congiure terminal) to the terminal to enter global configuation
+    NameResult=Session.expect(['\(config\)#', pexpect.TIMEOUT])#Expect to see '(config)#' after sending the conf t comand to the terminal use .\\ arounf conf
+    #Config error check
+    if NameResult == 0:
+        print('--- Entering Config mode')
+        
+        pass
+    else:
+        print('--- Entering config uncuccsessful')
+        exit()
+
+    print('\nPlease enter the name of the Device')
+    Hostname = input('Name:') #user inputs a new hostname, save as a varible for sendline later
+    Session.sendline(f'hostname {Hostname}') #send the hostname command with the hostname varible to set the new name, note the sting has to be set this way as sendline() only take 1 positinal argument
+    print(Hostname+'(config)#')
+    NameResult=Session.expect([Hostname+'\(config\)#', pexpect.TIMEOUT])#Expect to see the new 'hostname(config)#' after its been set
+
+    #host name error check 
+    if NameResult == 0:
+        print('--- Name change Succsesful')
+        Session.sendline('exit') # exit global configuration after hostname change (for future proofing incase adding more functions)
+        pass
+    else:
+        print('--- Hostname error could not set',Hostname)
+        Session.sendline('exit')
+        exit()
+
 def main():
     chosefunc()
+    HostName()
     
 main()
