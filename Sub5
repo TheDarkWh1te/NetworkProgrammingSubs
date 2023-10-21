@@ -18,7 +18,8 @@ def chosefunc():
         print('\n____USER INPUT____')
         print('1. Telnet to Device')
         print('2. SSH to Device')
-        op = input('Option: ')
+        #op = input('Option: ')
+        op = '1' # hardcode option for testing
         if op == '1':
             Telnetfunc()
             break#to leave the loop once the session has been created
@@ -168,7 +169,8 @@ def HostName():
         exit()
 
     print('\nPlease enter the name of the Device')
-    Hostname = input('Name:') #user inputs a new hostname, save as a varible for sendline later
+    #Hostname = input('Name:') #user inputs a new hostname, save as a varible for sendline later
+    Hostname = 'R1' #Hardcode for testing
     Session.sendline(f'hostname {Hostname}') #send the hostname command with the hostname varible to set the new name, note the sting has to be set this way as sendline() only take 1 positinal argument
     print(Hostname+'(config)#')
     NameResult=Session.expect([Hostname+'\(config\)#', pexpect.TIMEOUT])#Expect to see the new 'hostname(config)#' after its been set
@@ -185,11 +187,18 @@ def HostName():
 
 
 def ShowRun():
-    
     Output = open('ShowRunOut.txt','w')
     Session.logfile = Output
+    Session.sendline('terminal length 0')
     Session.sendline('show run')
+    ShowResult = Session.expect([' --More-- ', pexpect.TIMEOUT, pexpect.EOF])
+    if ShowResult == 0:
+        print('works')
+    else:
+        print('not works')
+    Session.sendline('exit')
     exit()
+# --More-- 
 
 def main():
     chosefunc()
