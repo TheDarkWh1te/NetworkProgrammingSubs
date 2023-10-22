@@ -191,11 +191,8 @@ def ShowRun():
     Session.logfile = Output
     Session.sendline('terminal length 0')
     Session.sendline('show run')
-    ShowResult = Session.expect([' --More-- ', pexpect.TIMEOUT, pexpect.EOF])
-    if ShowResult == 0:
-        print('works')
-    else:
-        print('not works')
+    Session.expect([pexpect.TIMEOUT,pexpect.EOF])
+
     Session.sendline('exit')
     exit()
 # --More-- 
