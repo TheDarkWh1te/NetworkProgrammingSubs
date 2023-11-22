@@ -1,0 +1,167 @@
+Using 2252 out of 33554432 bytes
+!
+! Last configuration change at 02:17:38 UTC Fri Nov 17 2023
+!
+version 16.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+platform console virtual
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$W.oD$vBD8emwekcTgVyqmF/CoR.
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+ip domain name domain.com
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-384216077
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-384216077
+ revocation-check none
+ rsakeypair TP-self-signed-384216077
+!
+!
+crypto pki certificate chain TP-self-signed-384216077
+ certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+!
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9C38DGUMB04
+no license smart enable
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+netconf-yang
+!
+restconf
+!
+username cisco privilege 15 secret 5 $1$yPeQ$MbwAJ1Qu6DOojhKGuByV/1
+!
+redundancy
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface GigabitEthernet1
+ description INSIDE
+ ip address 192.168.1.1 255.255.255.0
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+ip forward-protocol nd
+no ip http server
+ip http authentication local
+ip http secure-server
+!
+ip ssh version 2
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+banner motd ^C
+*                                           *
+**                                         **
+***                                       ***
+***  Cisco Networking Academy             ***
+***                                       ***
+***  This software is provided for        ***
+***   Educational Purposes                ***
+***    Only in Networking Academies       ***
+***                                       ***
+**                                         **
+*                                           *
+^C
+!
+line con 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ logging synchronous
+ login local
+ transport input all
+line vty 5 15
+ logging synchronous
+ login local
+ transport input ssh
+!
+!
+!
+!
+!
+!
+end
