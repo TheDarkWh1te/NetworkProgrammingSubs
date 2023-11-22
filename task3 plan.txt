@@ -1,0 +1,26 @@
+Produce, or include within your existing work, a script to configure at least one of
+the following paths:
+
+Computer Networks path:
+i. Configure a loopback and at least one other interface with an
+appropriate IP address on a router within your topology.
+
+-have options menu in  main to call functions 
+-set up a config interface for user selected interfaces f0/1 - 21 or g0/1 - 2
+-add menu option in main, let user select ip,
+-verify ip is correct and 'appropriate'
+-configure 
+
+
+Menu order
+
+chooseSSH_TELNET
+this is done in a vacume as it will not change
+
+Menu select
+
+1.change hostname 
+2.show running conf
+3.compare show/run (multiple func to execute )
+4.config new interface (selecIntFunc ChgIpFunc)
+5.config protocol(if more than one protocol has been make cos im smart, make sub menu for selection)
